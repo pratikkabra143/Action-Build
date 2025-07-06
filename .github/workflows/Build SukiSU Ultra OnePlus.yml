@@ -6,7 +6,7 @@ on:
         type: choice
         description: "Configuration file"
         required: true
-        default: oneplus_ace2_pro_v
+        default: oneplus12_v
         options:
           - oneplus_nord_ce4_v
           - oneplus_ace_3v_v
@@ -37,7 +37,7 @@ on:
         type: choice
         description: "Build method"
         required: true
-        default: gki
+        default: perf
         options:
           - gki
           - perf
@@ -54,7 +54,7 @@ on:
         type: string
         description: "Custom kernel suffix (leave blank to use random string)"
         required: false
-        default: ""
+        default: "pratikkabra143"
       BUILD_TIME:
         type: string
         description: "Custom build time (leave blank to use current time)"
