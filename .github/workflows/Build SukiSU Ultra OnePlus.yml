@@ -95,7 +95,7 @@ jobs:
 
   build:
     needs: get-config
-    name: ${{ github.event.inputs.FAST_BUILD == 'true' && ' [FAST]' || '' }}${{ github.event.inputs.SCHED == 'true' && ' [SCHED]' || '' }}${{ github.event.inputs.ZRAM == 'true' && ' [ZRAM]' || '' }}...
+    name: ${{ github.event.inputs.FAST_BUILD == 'true' && ' [FAST]' || '' }}${{ github.event.inputs.SCHED == 'true' && ' [SCHED]' || '' }}${{ github.event.inputs.ZRAM == 'true' && ' [ZRAM]' || '' }}For ${{ github.event.inputs.FILE }} ${{ github.event.inputs.BUILD_METHOD }} ${{ github.event.inputs.SUFFIX }}
     runs-on: ubuntu-latest
     env:
       CPU: ${{ needs.get-config.outputs.CPU }}
@@ -195,7 +195,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.CCACHE_DIR }}
-          key: ccache-${{ runner.os }}-${{ github.ref_name }}-${{ github.event.inputs.FILE }}-${{ github.event.inputs.BUILD_METHOD }}-${{ github.event.inputs.FAST_BUILD == 'true' && 'alpha' || 'beta' }}
+          key: ccache-${{ runner.os }}-${{ github.ref_name }}-${{ github.event.inputs.FILE }}-${{ github.event.inputs.BUILD_METHOD }}-${{ github.event.inputs.FAST_BUILD == 'true' && 'alpha' || 'beta' }}-11
 
       - name: Initialize Ccache
         run: |
@@ -507,7 +507,7 @@ jobs:
           # Remove build check
           sed -i 's/check_defconfig//' ./common/build.config.gki
 
-      # WindChill kernel, mainly for sm8750, may not work or run on other CPUs
+      # Fengchi core, mainly for sm8750, may not work or run on other CPUs
       - name: Add sched_ext
         if: ${{ github.event.inputs.SCHED == 'true' }}
         run: |
@@ -602,7 +602,10 @@ jobs:
           if [[ "$USE_LLVM_IAS" == "true" ]]; then
             MAKE_ARGS="LLVM_IAS=1 $MAKE_ARGS"
           fi
-
+  
+          # Optional cleanup of ccache cache (can be commented out if not cleaned)
+          # ccache -C
+          
           # Configure kernel
           make -j$(nproc --all) O=out $MAKE_ARGS gki_defconfig
 
@@ -659,6 +662,7 @@ jobs:
             for file in dtbo.img system_dlkm.erofs.img vendor_dlkm.img vendor_boot.img; do
               if [ -f "$dir2$file" ]; then
                 target_name="$file"
+                # Special handling of the target name of system_dlkm.erofs.img
                 if [ "$file" = "system_dlkm.erofs.img" ]; then
                   target_name="system_dlkm.img"
                 fi
